@@ -1240,3 +1240,34 @@ export const ALERT_EXCLUSIONS = [
   'tv show', 'sports', 'game', 'concert', 'festival', 'wedding',
   'vacation', 'travel tips', 'life hack', 'self-care', 'wellness',
 ];
+
+// ============================================
+// SIGNAL FEED — bridges data/feeds.ts FeedSource → Feed type
+// ============================================
+import { FEEDS as AI_FEED_SOURCES, type Pillar, type FeedSource } from '../../data/feeds';
+
+/** Convert a FeedSource from data/feeds.ts to the Feed type used by rss.ts */
+function feedSourceToFeed(fs: FeedSource): Feed {
+  return {
+    name: fs.name,
+    url: rss(fs.url),
+    type: fs.pillar,
+    region: fs.pillar,
+  };
+}
+
+/** All AI industry feeds grouped by pillar, for use in SignalFeedPanel */
+export const SIGNAL_FEEDS_BY_PILLAR: Record<Pillar, Feed[]> = (() => {
+  const byPillar = {} as Record<Pillar, Feed[]>;
+  for (const fs of AI_FEED_SOURCES) {
+    const arr = byPillar[fs.pillar] ??= [];
+    arr.push(feedSourceToFeed(fs));
+  }
+  return byPillar;
+})();
+
+/** Flat array of all AI industry feeds as Feed[] */
+export const SIGNAL_FEEDS_ALL: Feed[] = AI_FEED_SOURCES.map(feedSourceToFeed);
+
+/** Re-export Pillar type for convenience */
+export type { Pillar } from '../../data/feeds';

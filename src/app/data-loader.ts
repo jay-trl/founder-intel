@@ -11,6 +11,7 @@ import {
   SITE_VARIANT,
   LAYER_TO_SOURCE,
 } from '@/config';
+import { SIGNAL_FEEDS_ALL } from '@/config/feeds';
 import { INTEL_HOTSPOTS, CONFLICT_ZONES } from '@/config/geo';
 import { tokenizeForMatch, matchKeyword } from '@/utils/keyword-match';
 import {
@@ -110,6 +111,7 @@ import {
   SecurityAdvisoriesPanel,
   OrefSirensPanel,
   TelegramIntelPanel,
+  SignalFeedPanel,
 } from '@/components';
 import { SatelliteFiresPanel } from '@/components/SatelliteFiresPanel';
 import { classifyNewsItem } from '@/services/positive-classifier';
@@ -299,6 +301,7 @@ export class DataLoaderManager implements AppModule {
 
     const tasks: Array<{ name: string; task: Promise<void> }> = [
       { name: 'news', task: runGuarded('news', () => this.loadNews()) },
+      { name: 'signalFeed', task: runGuarded('signalFeed', () => this.loadSignalFeed()) },
     ];
 
     // Happy variant only loads news data -- skip all geopolitical/financial/military data
@@ -789,6 +792,18 @@ export class DataLoaderManager implements AppModule {
       this.ctx.statusPanel?.updateApi('RSS2JSON', { status: 'error' });
       delete this.ctx.newsByCategory[category];
       return [];
+    }
+  }
+
+  private async loadSignalFeed(): Promise<void> {
+    const panel = this.ctx.panels['signal-feed'] as SignalFeedPanel | undefined;
+    if (!panel) return;
+    try {
+      const items = await fetchCategoryFeeds(SIGNAL_FEEDS_ALL);
+      panel.renderSignals(items);
+      this.ctx.statusPanel?.updateFeed('SignalFeed', { status: 'ok', itemCount: items.length });
+    } catch (error) {
+      this.ctx.statusPanel?.updateFeed('SignalFeed', { status: 'error', errorMessage: String(error) });
     }
   }
 

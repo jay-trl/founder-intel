@@ -17,6 +17,7 @@ export interface Feed {
 }
 
 export type { ThreatClassification, ThreatLevel, EventCategory } from '@/services/threat-classifier';
+export type { Pillar } from '../../data/feeds';
 
 export interface NewsItem {
   source: string;

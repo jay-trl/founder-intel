@@ -40,6 +40,7 @@ import {
   WorldClockPanel,
   AirlineIntelPanel,
   AviationCommandBar,
+  SignalFeedPanel,
 } from '@/components';
 import { SatelliteFiresPanel } from '@/components/SatelliteFiresPanel';
 import { PositiveNewsFeedPanel } from '@/components/PositiveNewsFeedPanel';
@@ -445,6 +446,9 @@ export class PanelLayoutManager implements AppModule {
 
     this.ctx.map.initEscalationGetters();
     this.ctx.currentTimeRange = this.ctx.map.getTimeRange();
+
+    const signalFeedPanel = new SignalFeedPanel();
+    this.ctx.panels['signal-feed'] = signalFeedPanel;
 
     const politicsPanel = new NewsPanel('politics', t('panels.politics'));
     this.attachRelatedAssetHandlers(politicsPanel);
